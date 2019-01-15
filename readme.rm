@@ -1,0 +1,2 @@
+Install mongodb
+--> npm install mongodb --save
