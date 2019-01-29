@@ -1,4 +1,5 @@
 const { mongoose } = require("./db/mongoose");
+const { ObjectID } = require("mongodb");
 const { Todo } = require("./models/todo.model");
 const { User } = require("./models/user.model");
 const express = require("express");
@@ -35,6 +36,36 @@ app.get("/todos", (req, res) => {
       res.status(400).send(e);
     }
   );
+});
+
+// GET /todos/123554
+app.get("/todos/:id", (req, res) => {
+  var id = req.params.id;
+
+  // validate id by ObjectID isValid
+  // 404 was not found - send back empty body
+  if (!ObjectID.isValid(id)) {
+    res.status(404).send({ msg: "Id is not valid" });
+    return console.log("the id is invalid");
+  }
+
+  // findById
+  // success
+  // if todo - send it back
+  // if no todo - send back 404 with empty body
+  Todo.findById(id)
+    .then(todo => {
+      if (todo) {
+        res.send({ todo });
+      } else {
+        res.status(404).send({ msg: "id is not found" });
+      }
+    })
+    .catch(e => {
+      res.status(400).send({ msg: e });
+    });
+  // error
+  // 400 - and send empty body back
 });
 
 app.listen(3000, () => {
