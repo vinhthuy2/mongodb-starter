@@ -11,6 +11,7 @@ heroku install
     --> heroku create
     --> git push heroku
     --> heroku addons:create mongolab:sandbox
+    --> heroku logs
 
 generating ssh key:
 --> ssh-keygen -t rsa -b 4096 -C "mr.thuytran@gmail.com"
