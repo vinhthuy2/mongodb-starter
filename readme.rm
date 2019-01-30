@@ -1,2 +1,16 @@
 Install mongodb
 --> npm install mongodb --save
+
+heroku install
+--> npm install heroku --global
+--> heroku toolbelt 
+    --> heroku --help
+    --> heroku login
+
+generating ssh key:
+--> ssh-keygen -t rsa -b 4096 -C "mr.thuytran@gmail.com"
+--> list all ssh keys : ls -al ~/.ssh
+--> ensure ssh-agent is running: eval $(ssh-agent -s)
+--> add SSH private key to ssh-agent: ssh-add ~/.ssh/id_rsa
+--> copy the SSH to clipboard: clip < ~/.ssh/id_rsa.pub
+--> authenticate host: ssh -T git@github.com
