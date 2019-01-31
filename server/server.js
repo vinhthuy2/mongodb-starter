@@ -92,7 +92,7 @@ app.delete("/todos/:id", (req, res) => {
     .catch(err => {
       // error
       // 400 with empty body
-      res.status(400).send(err);
+      res.status(400).send();
     });
 });
 
