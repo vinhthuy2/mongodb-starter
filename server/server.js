@@ -69,6 +69,33 @@ app.get("/todos/:id", (req, res) => {
   // 400 - and send empty body back
 });
 
+app.delete("/todos/:id", (req, res) => {
+  // get the id
+  var id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    //validate the id --> not valid? --> return 404
+    res.status(404).send({ msg: "Id is not valid" });
+  }
+
+  // remove todo by id
+  Todo.findByIdAndDelete(id)
+    .then(todo => {
+      // success
+      // if doc --> return doc, 200
+      if (todo) {
+        res.status(200).send({ todo });
+      } else {
+        // if not doc --> send 404
+        res.status(404).send({ msg: "id is not found" });
+      }
+    })
+    .catch(err => {
+      // error
+      // 400 with empty body
+      res.status(400).send(err);
+    });
+});
+
 app.listen(port, () => {
   console.log(`started on port ${port}`);
 });
