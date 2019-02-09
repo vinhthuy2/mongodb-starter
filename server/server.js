@@ -14,6 +14,113 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
+// POST /users
+app.post("/users", (req, res) => {
+  var body = _.pick(req.body, ["email", "password"]);
+  var user = new User(body);
+  user
+    .save()
+    .then(doc => {
+      return user.generateAuthToken();
+    })
+    .then(token => {
+      res.header("x-auth", token).send(user);
+    })
+    .catch(e => {
+      res.status(400).send(e);
+    });
+});
+
+// GET /users
+app.get("/users", (req, res) => {
+  User.find().then(
+    users => {
+      res.send({ users });
+    },
+    e => {
+      res.status(400).send(e);
+    }
+  );
+});
+
+// GET /users/:id
+app.get("/users/:id", (req, res) => {
+  var id = req.params.id;
+
+  // validate id by ObjectID isValid
+  // 404 was not found - send back empty body
+  if (!ObjectID.isValid(id)) {
+    res.status(404).send({ msg: "Id is not valid" });
+    return console.log("the id is invalid");
+  }
+
+  User.findById(id)
+    .then(user => {
+      if (user) {
+        res.send({ user });
+      } else {
+        res.status(404).send();
+      }
+    })
+    .catch(e => {
+      res.status(400).send(e);
+    });
+});
+
+// DELETE /users/:id
+app.delete("/users/:id", (req, res) => {
+  var id = req.params.id;
+
+  if (!ObjectID.isValid(id)) {
+    res.status(404).send({ msg: "Id is not valid" });
+    return console.log("the id is invalid");
+  }
+
+  User.findByIdAndDelete(id)
+    .then(user => {
+      if (user) {
+        res.send({ user });
+      } else {
+        res.status(404).send();
+      }
+    })
+    .catch(e => {
+      res.status(400).send();
+    });
+});
+
+// PATCH /users/:id
+app.patch("/users/:id", (req, res) => {
+  var id = req.params.id;
+  var body = _.pick(req.body, ["email", "password"]);
+
+  if (!ObjectID.isValid(id)) {
+    //validate the id --> not valid? --> return 404
+    res.status(404).send({ msg: "Id is not valid" });
+  }
+
+  User.findByIdAndUpdate(
+    id,
+    {
+      $set: body
+    },
+    { new: true }
+  )
+    .then(user => {
+      if (!user) {
+        return res.status(404).send();
+      }
+
+      res.send({ user });
+    })
+    .catch(e => {
+      res.status(400).send();
+    });
+});
+
+////////////////////////////////////////////////////////////////
+
+// POST /todos
 app.post("/todos", (req, res) => {
   var todo = new Todo({
     text: req.body.text,
@@ -31,6 +138,7 @@ app.post("/todos", (req, res) => {
   );
 });
 
+// GET /todos
 app.get("/todos", (req, res) => {
   Todo.find().then(
     todos => {
@@ -72,6 +180,7 @@ app.get("/todos/:id", (req, res) => {
   // 400 - and send empty body back
 });
 
+// DELETE /todos/123554
 app.delete("/todos/:id", (req, res) => {
   // get the id
   var id = req.params.id;
@@ -99,6 +208,7 @@ app.delete("/todos/:id", (req, res) => {
     });
 });
 
+// PATCH /todos/:id
 app.patch("/todos/:id", (req, res) => {
   var id = req.params.id;
   var body = _.pick(req.body, ["text", "completed"]);
